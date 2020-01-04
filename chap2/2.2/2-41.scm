@@ -1,0 +1,22 @@
+(load "./P83-flatmap.scm")
+(load "./P78-enumerate-interval.scm")
+
+(define (equal-sum? s triad)
+    (= s (+ (car triad) (cadr triad) (caddr triad))))
+(define (triples-sum-equal s n)
+    (filter (lambda (seq) (equal-sum? s seq))
+            (unique-triples n)))
+
+
+(define (unique-pairs n)
+    (flatmap (lambda (i) (map (lambda (j) (list i j))
+                            (enumerate-interval 1 (- i 1))))
+            (enumerate-interval 1 n)))
+(define (unique-triples n)
+    (flatmap (lambda (i) (map (lambda (j) (cons i j))
+                              (unique-pairs (- i 1))))
+            (enumerate-interval 1 n)))
+; (integer-sum-pairs 3 6)
+(unique-pairs 6)
+(unique-triples 6)
+(triples-sum-equal 10 13)

@@ -1,0 +1,20 @@
+(load "./1-35-fixed-point.scm")
+(load "./1-43-repeated.scm")
+(load "../1.2/1-16-fast-expt.scm")
+
+(define (average a b)
+    (/ (+ a b) 2))
+(define (average-damp f)
+    (lambda (x) (average x (f x))))
+
+(define (n-sqrt n x)
+    (define (repeat-times v)
+        (define (iter v i)
+            (if (< v (fast-expt 2 i))
+                (- i 1)
+                (iter v (+ i 1))))
+        (iter v 1))
+    (fixed-point ((repeated average-damp (repeat-times n)) (lambda (y) (/ x (fast-expt y (- n 1)))))
+                 1.0))
+
+(n-sqrt 130 1e4)

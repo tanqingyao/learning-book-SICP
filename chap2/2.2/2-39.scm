@@ -1,0 +1,7 @@
+(load "./2-38.scm")
+(define (reverse-r sequence)
+    (fold-right (lambda (x y) (append y (list x))) '() sequence))
+(define (reverse-l sequence)
+    (fold-left (lambda (x y) (cons y x)) '() sequence))
+(reverse-r (list 1 2 3))
+(reverse-l (list 1 2 3))

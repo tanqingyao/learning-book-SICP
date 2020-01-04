@@ -1,0 +1,15 @@
+(define (* a b)
+    (if (= b 0)
+        0
+        (+ a (* a (- b 1)))))
+
+(define (fast-* a b)
+    (define (double x)
+        (+ x x))
+    (define (halve x)
+            (/ x 2))
+    (cond ((= b 1) a)
+        ((even? b) (fast-* (double a) (halve b)))
+        (else (+ a (fast-* a (- b 1))))))
+(trace fast-*)
+(fast-* 3 4)

@@ -1,0 +1,71 @@
+(load "./P102-Digital.scm")
+(define (deriv exp var)
+    (cond   ((number? exp) 0)
+            ((variable? exp) (if (same-variable? exp var) 1 0))
+            ((sum? exp) (make-sum (deriv (addend exp) var)
+                              (deriv (augend exp) var)))
+            ((product? exp) (make-sum (make-product (multiplier exp)
+                                                  (deriv (multiplicand exp) var))
+                                    (make-product (deriv (multiplier exp) var)
+                                                  (multiplicand exp))))
+            ; 2-56 求幂导数
+            ((exponentiation? exp) (let ((u (base exp))
+                                         (n (exponent exp)))
+                                        (make-product n
+                                                (make-product  (make-exponentiation u (- n 1))
+                                                               (deriv u var)))))
+            (else (error "unknown expression type -- DERIV" exp))))
+
+
+(define (single-operand? op-list) (if (null? (cdr op-list)) #t #f))
+
+; 和表达式
+(define (make-sum a1 a2) (cond ((=number? a1 0) a2)
+                               ((=number? a2 0) a1)
+                               ((and (number? a1) (number? a2)) (+ a1 a2))
+                               (else (list '+ a1 a2))))
+(define (addend s) (cadr s))
+; 2-57 '(+ x y z a)可转化为'(+ x (+ y z a))
+; (define (augend s) (caddr s))
+(define (augend s)
+    (let ((op-list (cddr s)))
+        (if (single-operand? op-list)
+            (car op-list)
+            (append (list '+) op-list))))
+(define (sum? x) (and (pair? x) (eq? (car x) '+)))
+; 乘积表达式
+(define (make-product m1 m2) (cond  ((or (=number? m1 0) (=number? m2 0)) 0)
+                                    ((=number? m1 1) m2)
+                                    ((=number? m2 1) m1)
+                                    ((and (number? m1) (number? m2)) (* m1 m2))
+                                    (else (list '* m1 m2))))
+
+(define (multiplier p) (cadr p))
+; 2-57 '(* x y z a)可转化为'(* x (* y z a))
+(define (multiplicand p)
+    (let ((op-list (cddr p)))
+        (if (single-operand? op-list)
+            (car op-list)
+            (append (list '*) op-list))))
+(define (product? x) (and (pair? x) (eq? (car x) '*)))
+
+; 2-56 幂表达式
+(define (make-exponentiation base exponent) (cond ((= exponent 0) 1)
+                                                  ((= exponent 1) base)
+                                                  (else (list 'e base exponent))))
+(define (base e) (cadr e))
+(define (exponent e) (caddr e))
+(define (exponentiation? x)(and (pair? x) (eq? (car x) 'e)))
+; test
+(deriv '(+ x 3) 'x)
+(deriv '(* x y) 'x)
+(deriv '(* (* x y) (+ x 3)) 'x)
+(deriv '(* x y (+ x 3)) 'x)
+
+(deriv '(e x 0) 'x)
+(deriv '(e x 1) 'x)
+(deriv '(e x 2) 'x)
+(deriv '(e x 3) 'x)
+
+(deriv '(+ x (+ 3 x)) 'x)
+(deriv '(+ x 3 x) 'x)

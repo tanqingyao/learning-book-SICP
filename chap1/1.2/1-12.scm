@@ -1,0 +1,20 @@
+(define (Pascal row col)
+    (if (or (= row col) (= 1 col))
+        1
+        (+  (Pascal (- row 1) col)
+            (Pascal (- row 1) (- col 1)))))
+; (Pascal 10 20)
+
+(define (Pascal-itre row col)
+    (/ (factorial row) 
+        (* (factorial col) (factorial (- row col)))))
+(define (factorial n)
+    (fact-iter 1 1 n))
+(define (fact-iter product counter max-count)
+    (if (> counter max-count)
+        product
+        (fact-iter (* counter product)
+                    (+ counter 1)
+                    max-count)))
+(factorial 6)
+(Pascal-itre 30 20)

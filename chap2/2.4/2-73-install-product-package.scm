@@ -1,0 +1,30 @@
+(load "./P119-tag.scm")
+(load "./P123-put-get.scm")
+(load "./P102-number?.scm")
+(define (install-product-pakage)
+    ;;internal procedures
+    (define (make-product m1 m2) (cond  ((or (=number? m1 0) (=number? m2 0)) 0)
+                                        ((=number? m1 1) m2)
+                                        ((=number? m2 1) m1)
+                                        ((and (number? m1) (number? m2)) (* m1 m2))
+                                        (else (list '* m1 m2))))
+    (define (multiplier p) (car p))
+    (define (multiplicand p) (cadr p))
+    ;;interface to the rest of the system
+    (put 'make-product '* make-product)
+    (put 'multiplier '* multiplier)
+    (put 'multiplicand '* multiplicand)
+    (put 'deriv '* 
+                (lambda (exp var) (make-sum (make-product (multiplier exp)
+                                                        (deriv (multiplicand exp) var))
+                                            (make-product (deriv (multiplier exp) var)
+                                                        (multiplicand exp)))))
+    )
+(define (make-product x y)
+    ((get 'make-product '*) x y))
+
+(define (multiplier product)
+    ((get 'multiplier '*) (contents product)))
+
+(define (multiplicand product)
+    ((get 'multiplicand '*) (contents product)))
